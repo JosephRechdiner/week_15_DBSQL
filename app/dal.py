@@ -95,7 +95,8 @@ def get_customers_with_shipping_dates(cnx):
             LEFT JOIN orders o
             ON c.customerNumber = o.customerNumber
             LEFT JOIN orderdetails od
-            ON o.orderNumber = od.orderNumber;
+            ON o.orderNumber = od.orderNumber
+            GROUP BY c.customerName, o.orderDate;
             """
     try:
         with cnx.cursor(dictionary=True) as cursor:
@@ -124,19 +125,19 @@ def get_customer_quantity_per_order(cnx):
             result = cursor.fetchall()
         return result
     except Exception as e:
-        raise Exception(f"could not execute p2: {str(e)}")
+        raise Exception(f"could not execute p7: {str(e)}")
 
 # 8
 def get_customers_payments_by_lastname_pattern(cnx, pattern: str = "son"):
     """Return customers and payments for last names matching pattern."""
     query = """
-            SELECT c.customerName, CONCAT(e.firstName, ' ' ,e.lastName) AS employeeFullName, COUNT(c.customerName) AS totalAmount
+            SELECT c.customerName, CONCAT(e.firstName, ' ' ,e.lastName) AS employeeFullName, SUM(p.amount) AS totalAmount
             FROM customers c
             JOIN employees e
             ON c.salesRepEmployeeNumber = e.employeeNumber
             JOIN payments p
             ON c.customerNumber = p.customerNumber
-            WHERE c.customerName LIKE '%Mu%' OR c.customerName LIKE '%ly%'
+            WHERE c.contactFirstName LIKE '%Mu%' OR c.contactFirstName LIKE '%ly%'
             GROUP BY c.customerName, CONCAT(e.firstName, ' ' ,e.lastName)
             ORDER BY totalAmount DESC;
             """
@@ -146,4 +147,4 @@ def get_customers_payments_by_lastname_pattern(cnx, pattern: str = "son"):
             result = cursor.fetchall()
         return result
     except Exception as e:
-        raise Exception(f"could not execute p2: {str(e)}")
+        raise Exception(f"could not execute p8: {str(e)}")
