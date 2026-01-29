@@ -3,7 +3,6 @@ from db_init import init_database
 from db import get_db_connection
 import dal
 
-
 app = FastAPI()
 
 init_database()
